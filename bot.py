@@ -33,14 +33,18 @@ def send_track(call):
         if call.data == value:
             track = key;
 
+
     filename = download_track(track)
 
     track_file = open(filename, 'rb')
-    bot.answer_callback_query(call.id, "Download.")
+    bot.answer_callback_query(call.id, "Downloading.")
 
     bot.send_audio(call.message.chat.id, track_file)
     track_file.close()
 
     os.remove(filename)
+
+    bot.delete_message(call.message.chat.id, call.message.id)
+    bot.delete_message(call.message.chat.id, call.message.id - 1)
 
 bot.infinity_polling()
