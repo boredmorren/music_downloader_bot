@@ -10,7 +10,7 @@ def print_all_tracks(query):
 
     for i, track in enumerate(track_list, 1):
         if i <= 10:
-            track_dict[track] = track.artists[0].name + ' - ' + track.title
+            track_dict[track] = track.artists[0].name  + ' - ' + track.title
     
     return track_dict
    

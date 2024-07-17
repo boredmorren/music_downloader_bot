@@ -1,7 +1,7 @@
 import telebot
 import telebot.formatting
 from music_searcher import download_track, print_all_tracks
-import os
+import os, zlib, base64
 
 bot = telebot.TeleBot(os.getenv("TOKEN"))
 
@@ -18,10 +18,13 @@ def print_tracks(message, f=None):
     markup = telebot.types.InlineKeyboardMarkup()
 
     for track_title in tracks_list.values():
-        markup.add(telebot.types.InlineKeyboardButton(text=track_title, callback_data=track_title))
+        if len(track_title.encode('utf-8')) < 64:
+            markup.add(telebot.types.InlineKeyboardButton(text=track_title, callback_data=track_title))
+        else:
+            markup.add(telebot.types.InlineKeyboardButton(text=track_title.split(' - ')[0], callback_data=track_title.split(' - ')[0]))
 
 
-    bot.send_message(message.chat.id, text='Выберите подходящий трек:', reply_markup=markup)      
+    bot.send_message(message.chat.id, text='Выберите подходящий трек или исполнителя', reply_markup=markup)      
     
 
 @bot.callback_query_handler(func=lambda call: True)
@@ -36,5 +39,8 @@ def send_track(call):
     bot.answer_callback_query(call.id, "Download.")
 
     bot.send_audio(call.message.chat.id, track_file)
+    track_file.close()
+
+    os.remove(filename)
 
 bot.infinity_polling()
